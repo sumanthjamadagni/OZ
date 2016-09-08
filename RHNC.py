@@ -10,15 +10,17 @@ def RHNC_Closure(er, Ur, Ur_ref, gr_ref, er_ref, kT=1.0):
     return cr
 
 def OZSolver_RHNC(r, k, Ur, Ur_ref, rho, kT=1.0, maxiter=10000, w_old=0.50, tol=1e-10, cr_guess=None):     
-    Flag_ref, hr_ref, cr_ref, er_ref, hk_ref, Sk_ref = HNC.OZSolver_HNC_Iterative(r, k, Ur_ref, rho, kT=1.0, maxiter=10000, w_old_start=0.50, tol=1e-10) 
+    Flag_ref, hr_ref, cr_ref, er_ref, hk_ref, Sk_ref = HNC.OZSolver_HNC_Iterative(r, k, Ur_ref, rho, kT=1.0, maxiter=10000, w_old_start=0.50, tol=tol) 
     
+    nr = len(r)
     if Flag_ref != 0:
         print "reference fluid HNC calculation failed!"
+        return Flag_ref , np.zeros(nr), np.zeros(nr), np.zeros(nr), np.zeros(nr), np.zeros(nr)
+    
                 
     if Flag_ref == 0: #the HNC calculation for the refernce fluid has converged. 
         gr_ref = hr_ref + 1        
 
-        nr = len(r)
         w_new = 1.0 - w_old
         if cr_guess == None:
             cr = OZF.cr_initguess(Ur)
@@ -85,7 +87,7 @@ def OZSolver_RHNC_Iterative(r, k, Ur, Ur_ref, rho, kT=1.0, maxiter=10000, w_old_
     while Flag == -1 and w < w_old_max * 0.95:
         iter_OZ = iter_OZ + 1
         
-        Flag, hr, cr, er, hk, Sk = OZSolver_RHNC(r, k, Ur, Ur_ref, rho, kT=1.0, maxiter=maxiter, w_old=w, tol=tol, cr_guess=cr_guess)
+        Flag, hr, cr, er, hk, Sk = OZSolver_RHNC(r, k, Ur, Ur_ref, rho, kT=kT, maxiter=maxiter, w_old=w, tol=tol, cr_guess=cr_guess)
         print "iter_OZ = ", iter_OZ, "Setting w_old = ", w, "Flag = ", Flag, "rho = ", rho
             
         if Flag == 0:

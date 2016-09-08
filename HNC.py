@@ -75,7 +75,7 @@ def OZSolver_HNC_Iterative(r, k, Ur, rho, kT=1.0, maxiter=10000, w_old_start=0.5
     while Flag == -1 and w < w_old_max * 0.95:
         iter_OZ = iter_OZ + 1
         
-        Flag, hr, cr, er, hk, Sk = OZSolver_HNC(r, k, Ur, rho, kT=1.0, maxiter=maxiter, w_old=w, tol=tol, cr_guess=cr_guess)
+        Flag, hr, cr, er, hk, Sk = OZSolver_HNC(r, k, Ur, rho, kT=kT, maxiter=maxiter, w_old=w, tol=tol, cr_guess=cr_guess)
         print "iter_OZ = ", iter_OZ, "Setting w_old = ", w, "Flag = ", Flag, "rho = ", rho
             
         if Flag == 0:

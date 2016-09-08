@@ -12,6 +12,13 @@ def LJPotential_NonDim(r, T_LJ=1.0):
     return U_LJ
 
 
+
+def SoftSpherePotential(r, sig=1.0, eps=1.0, m=12):
+    U_SS = 4 * eps * ((sig/r)**m) 
+    return U_SS
+
+
+
 def LJPotential(r, sig=1.0, eps=1.0, m=12, n=6):
     if m < n:
         print "Wrong LJ type potential. m < n!!"
