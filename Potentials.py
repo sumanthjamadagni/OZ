@@ -40,6 +40,10 @@ def SALRPotential(r, sig=1.0, eps=1.0, d=1.0, A=2.0, m=12, n=6):
     U_SALR = LJPotential(r,sig=sig,eps=eps,  m=m, n=n) + A*np.exp(-(r-sig)/d)/r
     return U_SALR
 
+def SALRPotential_v2(r, sig=1.0, eps_rep=1.0, eps_att=1.0, d=1.0, A=2.0, m=12, n=6):
+    U_SALR = 4*(eps_rep*(sig/r)**m - eps_att*(sig/r)**n)  + A*np.exp(-(r-sig)/d)/r
+    return U_SALR
+
 def SRLRPotential(r, sig=1.0, eps=1.0, d=1.0, A=2.0, m=12, n=6):       
     U_SRLR = WCAPotential(r,sig=sig,eps=eps, m=m, n=n) + A*np.exp(-(r-sig)/d)/r
     return U_SRLR
