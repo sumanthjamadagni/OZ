@@ -69,7 +69,7 @@ def WCAPotential_v2(r, sig=1.0, eps=1.0, m=12, n=6):
     return U_WCA
 
 def SALRPotential_v2(r, sig=1.0, eps=1.0, d=1.0, A=2.0, m=12, n=6):
-    U_SALR = LJPotentialv_v2(r, sig=sig, eps=eps, m=m, n=n)  + A*np.exp(-(r-sig)/d)/r
+    U_SALR = LJPotential_v2(r, sig=sig, eps=eps, m=m, n=n)  + A*np.exp(-(r-sig)/d)/r
     return U_SALR
 
 def SRLRPotential_v2(r, sig=1.0, eps=1.0, d=1.0, A=2.0, m=12, n=6):       
