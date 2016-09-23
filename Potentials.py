@@ -32,25 +32,7 @@ def WCAPotential(r, sig=1.0, eps=1.0, m=12, n=6):
     p = 1.0/(m-n)
     rcut = sig * (float(m)/float(n))**p
     U_temp = LJPotential(r, sig=sig, eps=eps, m=m, n=n)
-    U_temp = U_temp - np.min(U_temp)
-    U_WCA = np.where(r < rcut, U_temp, 0)
-    return U_WCA
-
-
-def LJPotential_v2(r, sig=1.0, eps=1.0, m=12, n=6):
-    if m < n:
-        print "Wrong LJ type potential. m < n!!"
-        print "Exiting"
-        sys.exit()
-    U_LJ = 4 * ((sig/r)**m - eps*(sig/r)**n) 
-    return U_LJ
-
-
-def WCAPotential_v2(r, sig=1.0, eps=1.0, m=12, n=6):
-    p = 1.0/(m-n)
-    rcut = sig * (float(m)/float(n)/eps)**p
-    U_temp = LJPotential(r, sig=sig, eps=eps, m=m, n=n)
-    U_temp = U_temp - np.min(U_temp)
+    U_temp = U_temp - np.min(U_temp) #min(U_temp) is negative - so, adding a positive quantitity. 
     U_WCA = np.where(r < rcut, U_temp, 0)
     return U_WCA
 
@@ -66,8 +48,28 @@ def SRLRPotential(r, sig=1.0, eps=1.0, d=1.0, A=2.0, m=12, n=6):
     return U_SRLR
 
 #---
+def LJPotential_v2(r, sig=1.0, eps=1.0, m=12, n=6):
+    ''' epsilon is only multiplied to the attractive part. So with
+    eps=0.0, you get a purely repulsive potential '''
+
+    if m < n:
+        print "Wrong LJ type potential. m < n!!"
+        print "Exiting"
+        sys.exit()
+    U_LJ = 4 * (sig/r)**m - 4 * eps*(sig/r)**n
+    return U_LJ
+
+
+def WCAPotential_v2(r, sig=1.0, eps=1.0, m=12, n=6):
+    p = 1.0/(m-n)
+    rcut = sig * (float(m)/float(n)/eps)**p
+    U_temp = LJPotential_v2(r, sig=sig, eps=eps, m=m, n=n)
+    U_temp = U_temp - np.min(U_temp)
+    U_WCA = np.where(r < rcut, U_temp, 0)
+    return U_WCA
+
 def SALRPotential_v2(r, sig=1.0, eps=1.0, d=1.0, A=2.0, m=12, n=6):
-    U_SALR = 4 * (sig/r)**m - 4 * eps*(sig/r)**n  + A*np.exp(-(r-sig)/d)/r
+    U_SALR = LJPotentialv_v2(r, sig=sig, eps=eps, m=m, n=n)  + A*np.exp(-(r-sig)/d)/r
     return U_SALR
 
 def SRLRPotential_v2(r, sig=1.0, eps=1.0, d=1.0, A=2.0, m=12, n=6):       
@@ -75,6 +77,7 @@ def SRLRPotential_v2(r, sig=1.0, eps=1.0, d=1.0, A=2.0, m=12, n=6):
     return U_SRLR
 
 #---
+
 def DPDPotential(r, A=15.0):
     U_DPD = np.where(r < 1.0, 0.5*A*(1-r)**2, 0.0)
     return U_DPD
