@@ -9,8 +9,10 @@ def RHNC_Closure(er, Ur, Ur_ref, gr_ref, er_ref, kT=1.0):
     cr = gr_ref * np.exp(-deltaU/kT + delta_er) - er - 1.0        
     return cr
 
-def OZSolver_RHNC(r, k, Ur, Ur_ref, rho, kT=1.0, maxiter=10000, w_old=0.50, tol=1e-10, cr_guess=None):     
-    Flag_ref, hr_ref, cr_ref, er_ref, hk_ref, Sk_ref = HNC.OZSolver_HNC_Iterative(r, k, Ur_ref, rho, kT=1.0, maxiter=10000, w_old_start=0.50, tol=tol) 
+def OZSolver_RHNC(r, k, Ur, Ur_ref, rho, kT=1.0, maxiter=10000, w_old=0.50, tol=1e-10, cr_guess=None):    
+    #Note: no cr_guess is provided for reference potential that is purely repulsive.
+    #      Can be changed to try usign cr_guess for reference potential too in case this doesn't converge?
+    Flag_ref, hr_ref, cr_ref, er_ref, hk_ref, Sk_ref = HNC.OZSolver_HNC_Iterative(r, k, Ur_ref, rho, kT=kT, maxiter=10000, w_old_start=0.50, tol=tol) 
     
     nr = len(r)
     if Flag_ref != 0:
