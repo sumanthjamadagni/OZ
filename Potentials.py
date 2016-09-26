@@ -62,10 +62,14 @@ def LJPotential_v2(r, sig=1.0, eps=1.0, m=12, n=6):
 
 def WCAPotential_v2(r, sig=1.0, eps=1.0, m=12, n=6):
     p = 1.0/(m-n)
-    rcut = sig * (float(m)/float(n)/eps)**p
-    U_temp = LJPotential_v2(r, sig=sig, eps=eps, m=m, n=n)
-    U_temp = U_temp - np.min(U_temp)
-    U_WCA = np.where(r < rcut, U_temp, 0)
+    if eps > 0.0:
+        rcut = sig * (float(m)/float(n)/eps)**p
+        U_temp = LJPotential_v2(r, sig=sig, eps=eps, m=m, n=n)
+        U_temp = U_temp - np.min(U_temp)
+        U_WCA = np.where(r < rcut, U_temp, 0)
+    else:
+        U_WCA = LJPotential_v2(r, sig=sig, eps=0.0, m=m, n=n)
+
     return U_WCA
 
 def SALRPotential_v2(r, sig=1.0, eps=1.0, d=1.0, A=2.0, m=12, n=6):
@@ -84,8 +88,8 @@ def DPDPotential(r, A=15.0):
 
 
 #Second virial coefficient
-def CalcB2(r,Ur, kT=1.0):
-    I = (np.exp(-Ur/kT)-1.0) * r**2
+def CalcB2(r,Ur, T=1.0):
+    I = (np.exp(-Ur/T)-1.0) * r**2
     B2 = -2*np.pi * simps(I,r)
 
     return B2
@@ -93,17 +97,17 @@ def CalcB2(r,Ur, kT=1.0):
 #From Noro and Frenkel, JCP 2000: Extended Corresponding-State
 #Behavior For Particles With Variable Range Attractions.
 
-def Sigma_Eff(r,Urep, kT=1.0):
+def Sigma_Eff(r,Urep, T=1.0):
     #Eqn 4: Noro and Frenkel, JCP 2000
-    I = 1.0 - np.exp(-Urep/kT)
+    I = 1.0 - np.exp(-Urep/T)
     sigma = simps(I,r)
     return sigma
 
 
-def CalcB2_reduced(r, Ur, Urep, kT=1.0):
+def CalcB2_reduced(r, Ur, Urep, T=1.0):
     #Eqnation 6, Noro and Frenkel, JCP 2000
-    B2 = CalcB2(r,Ur,kT)
-    sigma_eff = Sigma_Eff(r,Urep, kT)
+    B2 = CalcB2(r,Ur,T)
+    sigma_eff = Sigma_Eff(r,Urep, T)
 
     B2_star = B2/(2.0/3.0 *np.pi * sigma_eff**3.0)
     return B2_star
@@ -114,14 +118,14 @@ def StickinessParameter(B2_star):
     return tau
 
 
-def SWMapping(r, Ur, Urep, kT=1.0):
+def SWMapping(r, Ur, Urep, T=1.0):
 
     eps = np.min(Ur)
-    Tstar = -kT/eps #reduced temperature
+    Tstar = -T/eps #reduced temperature
     if Tstar < 0.0:
         print "Tstar is negative. No minima in potential!!"
         
-    B2_star = CalcB2_reduced(r,Ur,Urep,kT)
+    B2_star = CalcB2_reduced(r,Ur,Urep,T)
 
     #Eqnation 10, Noro and Frenkel, JCP 2000
     lb = ((B2_star - 1.0)/(1.0 - np.exp(1.0/Tstar)) + 1.0)**(1.0/3.0)

@@ -12,7 +12,7 @@ pi = np.pi
 
 # --------------------------------------------
            
-def Calc_Pvirial(r,gr,Ur, rho, kT=1.0, rmin=0.10):
+def Calc_Pvirial(r,gr,Ur, rho, T=1.0, rmin=0.10):
     from scipy.integrate import simps 
 
     dr = r[2]-r[1]
@@ -21,10 +21,10 @@ def Calc_Pvirial(r,gr,Ur, rho, kT=1.0, rmin=0.10):
     
     Integrand = 4*pi*r[:-1]**3 * gr[:-1]* dUdr
     Integral = simps(Integrand[nmin:],r[nmin:-1])
-    Pv = rho * kT - rho**2/6.0  * Integral
+    Pv = rho * T - rho**2/6.0  * Integral
     return Pv
     
-def Calc_Pcompressibility(rho, kappa, opt='cum', offset=None, kT=1.0, B2=0.0):
+def Calc_Pcompressibility(rho, kappa, opt='cum', offset=None, T=1.0, B2=0.0):
     '''
     Both rho and kappa are 1D arrays.
     opt = cum
@@ -36,19 +36,23 @@ def Calc_Pcompressibility(rho, kappa, opt='cum', offset=None, kT=1.0, B2=0.0):
     
     if offset == None:
         try:
-            P0 = (rho[0] + B2*rho[0]**2)*kT
+            P0 = (rho[0] + B2*rho[0]**2)*T
         except IndexError:
             P0 = 0.0
+    else:
+        P0 = offset
     
     if opt == 'cum':
-        P_compressibility = cumtrapz(1.0/(rho * kappa), rho) + P0
+        P_c = cumtrapz(1.0/(rho * kappa), rho) + P0
     else:
-        P_compressibility = simps(1.0/rho*kappa, rho)
+        P_c = simps(1.0/rho*kappa, rho) + P0
+
+    P_kappa = np.append(np.array([P0]), P_c)
    
-    return P_compressibility 
+    return P_kappa
     
-def CalculateKappa(Sk, rho, kT=1.0):
-    kappa = Sk[0]/ rho / kT
+def CalculateKappa(Sk, rho, T=1.0):
+    kappa = Sk[0]/ rho / T
     return kappa 
 #--------------------------------------------------------------
 
@@ -87,4 +91,15 @@ def CoordinationNumber(r,gr,rho, rcut=None):
         return nr, ncut
     else:
         return nr
+
+
     
+def ExcessChemPot(r,hr, cr, rho, T=1):
+    '''
+    Equation 37 from Patrick Warrens Sunlight DPD documentation.
+    '''
+    er = hr - cr 
+    Integrand = r**2 * (0.5 * hr * er - cr)
+    mu_ex = 4 * np.pi * T * rho * simps(Integrand,r)
+    mu = mu_ex + T * np.log(rho)
+    return mu_ex, mu

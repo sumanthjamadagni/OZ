@@ -2,12 +2,12 @@
 import OZ_Functions as OZF
 import numpy as np 
 
-def HNC_Closure(er, Ur, kT=1.0):
+def HNC_Closure(er, Ur, T=1.0):
     #Eqn. 9 in Patrick Warren's documentation
-    cr = np.exp(-Ur/kT + er) - er - 1.0        
+    cr = np.exp(-Ur/T + er) - er - 1.0        
     return cr
 
-def OZSolver_HNC(r, k, Ur, rho, kT=1.0, maxiter=10000, w_old=0.50, tol=1e-10, cr_guess=None): 
+def OZSolver_HNC(r, k, Ur, rho, T=1.0, maxiter=10000, w_old=0.50, tol=1e-10, cr_guess=None): 
 
     nr = len(r)
     w_new = 1.0 - w_old
@@ -22,7 +22,7 @@ def OZSolver_HNC(r, k, Ur, rho, kT=1.0, maxiter=10000, w_old=0.50, tol=1e-10, cr
         ck = OZF.FourierBesselTransform(cr,r,k)
         ek = OZF.Calculate_ek(ck,rho)
         er = OZF.InvFourierBesselTransform(ek, r, k)        
-        cr_new = HNC_Closure(er, Ur, kT=kT)
+        cr_new = HNC_Closure(er, Ur, T=T)
         residual = np.linalg.norm(cr-cr_new)
         
         if residual < tol:
@@ -63,7 +63,7 @@ def OZSolver_HNC(r, k, Ur, rho, kT=1.0, maxiter=10000, w_old=0.50, tol=1e-10, cr
     else:        
         return Flag , np.zeros(nr), np.zeros(nr), np.zeros(nr), np.zeros(nr), np.zeros(nr)
 
-def OZSolver_HNC_Iterative(r, k, Ur, rho, kT=1.0, maxiter=10000, w_old_start=0.50,w_old_max=0.99,tol=1e-8, cr_guess=None):
+def OZSolver_HNC_Iterative(r, k, Ur, rho, T=1.0, maxiter=10000, w_old_start=0.50,w_old_max=0.99,tol=1e-8, cr_guess=None):
     '''
     Solve the OZ equation by changing the increasing the weight to
     picard iterator in case of non-convergence for small values of w_old
@@ -75,7 +75,7 @@ def OZSolver_HNC_Iterative(r, k, Ur, rho, kT=1.0, maxiter=10000, w_old_start=0.5
     while Flag == -1 and w < w_old_max * 0.95:
         iter_OZ = iter_OZ + 1
         
-        Flag, hr, cr, er, hk, Sk = OZSolver_HNC(r, k, Ur, rho, kT=kT, maxiter=maxiter, w_old=w, tol=tol, cr_guess=cr_guess)
+        Flag, hr, cr, er, hk, Sk = OZSolver_HNC(r, k, Ur, rho, T=T, maxiter=maxiter, w_old=w, tol=tol, cr_guess=cr_guess)
         print "iter_OZ = ", iter_OZ, "Setting w_old = ", w, "Flag = ", Flag, "rho = ", rho
             
         if Flag == 0:
